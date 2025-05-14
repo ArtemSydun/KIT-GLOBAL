@@ -30,8 +30,8 @@ async function bootstrap() {
 
   if (configService.get(configServiceKeys.NODE_ENV) !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('NestJS boilerplate')
-      .setDescription('NestJS boilerplate')
+      .setTitle('Project KIT GLOBAL')
+      .setDescription('Project KIT GLOBAL')
       .setVersion('1.0')
       .addBearerAuth({
         type: 'http',

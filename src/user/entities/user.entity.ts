@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRoles } from '../enums/role.enum';
+import { Task } from 'src/tasks/entities/task.entity';
 
 @Schema({ timestamps: true, collection: 'users' })
 export class User {
@@ -31,6 +32,13 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @ApiProperty({
+    description: 'User tasks',
+    type: [Task],
+  })
+  @Prop({ required: true })
+  tasks: Task[];
 
   @ApiProperty({
     description: 'Date when the user was created',

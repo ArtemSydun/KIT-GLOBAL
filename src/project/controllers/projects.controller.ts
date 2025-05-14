@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Res,
   UseGuards,
   HttpStatus,
 } from '@nestjs/common';
@@ -17,9 +16,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiOkResponse,
-  ApiNotFoundResponse,
   getSchemaPath,
-  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -27,6 +24,7 @@ import { Roles } from 'src/common/decorators/auth.role.decorator';
 import {
   ApiCustomUnathorizedResponse,
   ApiCustomForbiddenResponse,
+  ApiCustomNotFoundResponse,
 } from 'src/common/decorators/swagger.decorators';
 import { DefaultResponse } from 'src/common/interfaces/responses';
 import { UserRoles } from 'src/user/enums/role.enum';
@@ -138,8 +136,9 @@ export class ProjectsController {
   @ApiOkResponse({
     description: 'Project ${name} and all related tasks deleted successfully',
   })
-  @ApiNotFoundResponse()
+  @ApiCustomForbiddenResponse()
+  @ApiCustomNotFoundResponse('Project', 'id')
   remove(@Param('id') id: string): Promise<DefaultResponse<null>> {
-    return this.projectsService.removeProject(id);
+    return this.projectsService.removeProjectById(id);
   }
 }

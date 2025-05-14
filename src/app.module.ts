@@ -8,6 +8,8 @@ import { ThrottlerBehindProxyGuard } from './common/guards/throttler-proxy.guard
 import { DatabaseModule } from './database/database.module';
 import { MailerModule } from './mailer/mailer.module';
 import { UsersModule } from './user/users.module';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './project/projects.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { UsersModule } from './user/users.module';
     AuthModule,
     MailerModule,
     UsersModule,
+    ProjectsModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [

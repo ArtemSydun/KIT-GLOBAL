@@ -1,6 +1,8 @@
 import {
   ConflictException,
+  forwardRef,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -98,7 +100,63 @@ export class ProjectsService {
     };
   }
 
-  public async removeProject(id: string): Promise<DefaultResponse<null>> {
+  public async updateProjectTask(
+    projectId: string,
+    taskName: string,
+    updatedTask: ProjectTask,
+  ): Promise<DefaultResponse<Project>> {
+    const projectToUpdate = await this.findProjectById(projectId);
+
+    const duplicateName = projectToUpdate.tasks.find(
+      (task) => task.name === updatedTask.name && task.name !== taskName,
+    );
+
+    if (duplicateName) {
+      throw new ConflictException(
+        `Task with name "${updatedTask.name}" already exists in project.`,
+      );
+    }
+
+    const updatedTasksArray = projectToUpdate.tasks.map((task) =>
+      task.name === taskName ? updatedTask : task,
+    );
+
+    const updatedProject = await this.projectsRepository.updateById(projectId, {
+      tasks: updatedTasksArray,
+    });
+
+    return {
+      message: `Task "${taskName}" in project "${projectToUpdate.name}" successfully updated`,
+      statusCode: HttpStatus.OK,
+      data: updatedProject,
+    };
+  }
+
+  public async removeTaskFromProject(
+    id: string,
+    taskName: string,
+  ): Promise<DefaultResponse<Project>> {
+    const projectToUpdate = await this.findProjectById(id);
+
+    const updatedTasksArray = projectToUpdate.tasks.filter(
+      (task) => task.name !== taskName,
+    );
+
+    const updatedProject = await this.projectsRepository.updateById(
+      projectToUpdate?.id,
+      {
+        tasks: updatedTasksArray,
+      },
+    );
+
+    return {
+      message: `Task ${taskName} removed from project ${projectToUpdate?.name} successfully`,
+      statusCode: HttpStatus.OK,
+      data: updatedProject,
+    };
+  }
+
+  public async removeProjectById(id: string): Promise<DefaultResponse<null>> {
     const projectToDelete = await this.findProjectById(id);
 
     await this.projectsRepository.deleteById(projectToDelete?.id);
