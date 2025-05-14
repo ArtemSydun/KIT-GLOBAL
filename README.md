@@ -29,3 +29,9 @@ A boilerplate project using:
 ```bash
 npm install
 cp .env.example .env.development
+
+
+npm run db:up  (to start db docker)
+
+npm run start:dev
+```
