@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 
 import {
@@ -15,6 +16,7 @@ import {
   ApiOperation,
   ApiOkResponse,
   getSchemaPath,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import {
@@ -28,6 +30,8 @@ import { Task } from 'src/tasks/entities/task.entity';
 import { TasksService } from '../services/tasks.service';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import { FindTasksQueryDto } from '../dto/tasks-query.dto';
+import { TaskStatuses } from '../enums/task-status.enum';
 
 @Controller('tasks')
 export class TasksController {
@@ -73,16 +77,26 @@ export class TasksController {
   @Get('all')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Get all tasks',
-    description: 'Get all tasks.',
+    summary: 'Get all tasks with filters',
+    description:
+      'Get all tasks with optional filters: status, projectId, createdAt, sort options, etc.',
   })
   @ApiOkResponse({
-    description: 'All tasks',
+    description: 'Filtered tasks list',
     type: [Task],
   })
   @ApiCustomUnathorizedResponse()
-  findAll(): Promise<Task[]> {
-    return this.tasksService.findAllTasks();
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    type: String,
+    enum: TaskStatuses,
+  })
+  @ApiQuery({ name: 'projectId', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['createdAt', 'name'] })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
+  findAll(@Query() query: FindTasksQueryDto): Promise<Task[]> {
+    return this.tasksService.findAllTasks(query);
   }
 
   @UseGuards(JwtAuthGuard)

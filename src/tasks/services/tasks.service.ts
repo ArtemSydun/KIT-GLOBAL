@@ -13,6 +13,7 @@ import { Task } from '../entities/task.entity';
 import { TasksRepository } from '../repositories/tasks.repository';
 import { ProjectsService } from 'src/project/services/projects.service';
 import { UpdateTaskDto } from '../dto/update-task.dto';
+import { FindTasksQueryDto } from '../dto/tasks-query.dto';
 
 @Injectable()
 export class TasksService {
@@ -47,8 +48,8 @@ export class TasksService {
     };
   }
 
-  public async findAllTasks(): Promise<Task[]> {
-    return await this.tasksRepository.findAllTasks();
+  public async findAllTasks(query: FindTasksQueryDto): Promise<Task[]> {
+    return this.tasksRepository.findAllTasks(query);
   }
 
   public async findTaskById(id: string): Promise<Task> {

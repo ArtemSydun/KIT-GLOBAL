@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from '../entities/task.entity';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import { FindTasksQueryDto } from '../dto/tasks-query.dto';
 
 @Injectable()
 export class TasksRepository {
@@ -23,8 +24,22 @@ export class TasksRepository {
     return this.TaskModel.find({ where: { projectId } }).lean().exec();
   }
 
-  async findAllTasks(): Promise<Task[]> {
-    return this.TaskModel.find().lean().exec();
+  async findAllTasks(query: FindTasksQueryDto): Promise<Task[]> {
+    const {
+      status,
+      projectId,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
+
+    const filter: any = {};
+    if (status) filter.status = status;
+    if (projectId) filter.projectId = projectId;
+
+    const sort: Record<string, 1 | -1> = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+    return this.TaskModel.find(filter).sort(sort).lean().exec();
   }
 
   async existsByName(name: string): Promise<boolean> {
